@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<head>
+	<title>#title#</title>
+	
+	<script type="text/javascript">
+    window.onload = function() {
+
+        var rdb1 = document.getElementById('rdbSelect1');
+        var rdb2 = document.getElementById('rdbSelect2');
+
+        rdb1.onclick = handler1;
+        rdb2.onclick = handler2;
+		
+		var url_string = window.location.href;
+		var url = new URL(url_string);
+		var sym = url.searchParams.get("symbol");
+		
+        var ddl = document.getElementById('symbol');
+		var opts = ddl.options.length;
+		for (var i=0; i<opts; i++){
+			if (ddl.options[i].value == sym){
+				ddl.options[i].selected = true;
+				break;
+			}
+		}
+    }
+
+    function handler1() {
+	
+	    var selectedSymbol = document.getElementById("symbol").value;
+        window.location.href = '/amount?symbol='+selectedSymbol;
+    }
+	
+	function handler2() {
+		var selectedSymbol = document.getElementById("symbol").value;
+        window.location.href = '/price?symbol='+selectedSymbol;
+    }
+  </script>
+	
+</head>
+
+<body>
+    <h1>#header#</h1>
+	
+	symbol: 
+	<select name="symbol" id="symbol"> 
+	  <option> 
+		btcusd 
+	  </option> 
+	  <option> 
+		ltcusd
+	  </option> 
+	  <option> 
+		ethusd
+	  </option> 
+	  <option> 
+		iotusd
+	  </option> 
+	  <option> 
+		etcbtc
+	  </option> 
+	</select> 
+	
+	<div style="width:400px">
+    <table class="style1" id="Table1">
+        <tr>
+            <td>
+                Trade Amount<input type="radio" id="rdbSelect1" name="Select" />
+            </td>
+            <td>
+                Trade Price<input type="radio" id="rdbSelect2" name="Select" />
+            </td>
+        </tr>
+    </table>
+</div>
+	
+    <br />
+	<div id="graphDiv1"></div>
+
+	<!--[if IE]><script src="excanvas.js"></script><![endif]-->
+	<script src="html5-canvas-bar-graph.js"></script>
+	<script>(function () {
+		function createCanvas(divName) {
+			
+			var div = document.getElementById(divName);
+			var canvas = document.createElement('canvas');
+			div.appendChild(canvas);
+			if (typeof G_vmlCanvasManager != 'undefined') {
+				canvas = G_vmlCanvasManager.initElement(canvas);
+			}	
+			var ctx = canvas.getContext("2d");
+			return ctx;
+		}
+		
+		var valueArray = '#valueData#';
+		var xLabelArray = '#xLabelData#';
+
+        var values = valueArray.split(",");
+		var xlabels = xLabelArray.split(",");
+		
+		var ctx = createCanvas("graphDiv1");
+		
+		var graph = new BarGraph(ctx);
+		graph.maxValue = Math.max.apply(null, values);
+		graph.margin = 1;
+		graph.width = 1020;
+		graph.height = 500;
+		graph.xAxisLabel = "time";
+
+		graph.xAxisLabelArr = xlabels;
+		/*setInterval(function () {
+			graph.update([Math.random() * 30, Math.random() * 30, Math.random() * 30, Math.random() * 30]);
+		}, 1000);*/
+		graph.update(values);
+		
+	}());</script>
+
+</body>
+</html>
