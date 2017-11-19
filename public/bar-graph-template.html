@@ -43,7 +43,7 @@
     <h1>#header#</h1>
     
     symbol: 
-    <select name="symbol" id="symbol"> 
+    <select name="Symbol" id="symbol">
       <option> 
         btcusd 
       </option> 
@@ -99,6 +99,43 @@
         Plotly.newPlot(Canvas, data);
     </script>
     
+    <h2>#header1#</h2>
+    
+    <div id="graphDiv2" style="width:1020px;height:500px;"></div>
+    <br />
+    
+    <script>
+        var valueArray = '#valueData#';
+        var xLabelArray = '#xLabelData#';
+        var values = valueArray.split(",");
+        var xlabels = xLabelArray.split(",");
+        
+        var value1Array = '#value1Data#';
+        var xLabel1Array = '#xLabel1Data#';
+        var values1 = value1Array.split(",");
+        var xlabels1 = xLabel1Array.split(",");
+        
+        var Canvas = document.getElementById('graphDiv2');
+        
+        var data1 = {
+            x: xlabels,
+            y: values,
+            name: Bitfinex,
+            type: 'bar'
+        };
+    
+        var data2 = {
+            x: xlabels1,
+            y: values1,
+            name: Kraken,
+            type: 'bar'
+        };
+    
+        var data = [data1,data2];
+        var layout = {barmode: 'group'};
+                    
+        Plotly.newPlot(Canvas, data,layout);
+    </script>
 
 </body>
 </html>
