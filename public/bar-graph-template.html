@@ -53,12 +53,6 @@
       <option> 
         ethusd
       </option> 
-      <option> 
-        iotusd
-      </option> 
-      <option> 
-        etcbtc
-      </option> 
     </select> 
     
     <div style="width:400px">
@@ -74,67 +68,42 @@
         </table>
     </div>
     
+
     <div id="graphDiv1" style="width:1020px;height:500px;"></div>
     <br />
-
+    
     <script>
-        var valueArray = '#valueData#';
-        var xLabelArray = '#xLabelData#';
-
-        var values = valueArray.split(",");
-        var xlabels = xLabelArray.split(",");
+        var valueArray1 = '#valueData1#';
+        var xLabelArray1 = '#xLabelData1#';
+        var values1 = valueArray1.split(",");
+        var xlabels1 = xLabelArray1.split(",");
         
+        var valueArray2 = '#valueData2#';
+        var xLabelArray2 = '#xLabelData2#';
+        var values2 = valueArray2.split(",");
+        var xlabels2 = xLabelArray2.split(",");
         
         var Canvas = document.getElementById('graphDiv1');
-        
-        var data = [
-            {
-                x: xlabels,
-                y: values,
-                type: 'bar'
-            }
-        ];
 
+		var trace1 = {
+		  x: xlabels1,
+		  y: values1,
+		  name: 'Bitfinex',
+		  type: 'bar'
+		};
 
-        Plotly.newPlot(Canvas, data);
-    </script>
+		var trace2 = {
+		  x: xlabels2,
+		  y: values2,
+		  name: 'Kraken',
+		  type: 'bar'
+		};
+		
+		var data = [trace1, trace2];
+		var layout = {barmode: 'group'};
     
-    <h2>#header1#</h2>
-    
-    <div id="graphDiv2" style="width:1020px;height:500px;"></div>
-    <br />
-    
-    <script>
-        var valueArray = '#valueData#';
-        var xLabelArray = '#xLabelData#';
-        var values = valueArray.split(",");
-        var xlabels = xLabelArray.split(",");
-        
-        var value1Array = '#value1Data#';
-        var xLabel1Array = '#xLabel1Data#';
-        var values1 = value1Array.split(",");
-        var xlabels1 = xLabel1Array.split(",");
-        
-        var Canvas = document.getElementById('graphDiv2');
-        
-        var data1 = {
-            x: xlabels,
-            y: values,
-            name: Bitfinex,
-            type: 'bar'
-        };
-    
-        var data2 = {
-            x: xlabels1,
-            y: values1,
-            name: Kraken,
-            type: 'bar'
-        };
-    
-        var data = [data1,data2];
-        var layout = {barmode: 'group'};
-                    
-        Plotly.newPlot(Canvas, data,layout);
+       Plotly.newPlot(Canvas, data,layout);
+
     </script>
 
 </body>
