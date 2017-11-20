@@ -8,12 +8,109 @@ var bitfinex_url = "https://api.bitfinex.com/v1"
 // Kraken API URL
 var kraken_url = "https://api.kraken.com/0/public/"
 
+// Symbol map from Bitfinex to Kraken
 var bitfinexToKrakenSymbol = {
     'btcusd': 'XBTUSD',
     'ltcusd': 'LTCUSD',
     'ethusd': 'ETHUSD',
     'etcbtc': 'ETHXBT'
 };
+
+// Dummy data for my trades
+var myTrades = [
+    {
+        "price":"9681.77",
+        "amount":"3.0",
+        "timestamp":"1505405289",
+        "exchange":"",
+        "type":"Buy",
+        "fee_currency":"USD",
+        "fee_amount":"-10.22",
+        "tid":11970500,
+        "order_id":446913500
+    },
+    {
+        "price":"4320.4",
+        "amount":"1.0",
+        "timestamp":"1506999369",
+        "exchange":"",
+        "type":"Buy",
+        "fee_currency":"USD",
+        "fee_amount":"-10.22",
+        "tid":11970700,
+        "order_id":446913800
+    },
+    {
+        "price":"5857.32",
+        "amount":"1.0",
+        "timestamp":"1510480929",
+        "exchange":"",
+        "type":"Buy",
+        "fee_currency":"USD",
+        "fee_amount":"-10.22",
+        "tid":11970750,
+        "order_id":446913850
+    },
+    {
+        "price":"7755.4",
+        "amount":"1.0",
+        "timestamp":"1511147133",
+        "exchange":"",
+        "type":"Buy",
+        "fee_currency":"USD",
+        "fee_amount":"-10.22",
+        "tid":11970839,
+        "order_id":446913929
+    }
+];
+
+
+// Dummy data for history movements
+var myMovements = [
+    {
+        "id":581000,
+        "txid":123100,
+        "currency":"BTC",
+        "method":"BITCOIN",
+        "type":"WITHDRAWAL",
+        "amount":"1",
+        "description":"3QXYWgRGX2BPYBpUDBssGbeWEa5zq6snBZ, offchain transfer ",
+        "address":"3QXYWgRGX2BPYBpUDBssGbeWEa5zq6snBZ",
+        "status":"COMPLETED",
+        "timestamp":"1509350529",
+        "timestamp_created":"1509350529.1",
+        "fee":0.1
+    },
+    {
+        "id":581050,
+        "txid":123150,
+        "currency":"BTC",
+        "method":"BITCOIN",
+        "type":"WITHDRAWAL",
+        "amount":".5",
+        "description":"3QXYWgRGX2BPYBpUDBssGbeWEa5zq6snBZ, offchain transfer ",
+        "address":"3QXYWgRGX2BPYBpUDBssGbeWEa5zq6snBZ",
+        "status":"COMPLETED",
+        "timestamp":"1510052529",
+        "timestamp_created":"1510052529.1",
+        "fee":0.1
+    },
+    {
+        "id":581183,
+        "txid":123456,
+        "currency":"BTC",
+        "method":"BITCOIN",
+        "type":"WITHDRAWAL",
+        "amount":".7",
+        "description":"3QXYWgRGX2BPYBpUDBssGbeWEa5zq6snBZ, offchain transfer ",
+        "address":"3QXYWgRGX2BPYBpUDBssGbeWEa5zq6snBZ",
+        "status":"COMPLETED",
+        "timestamp":"1511147160",
+        "timestamp_created":"1511147160.1",
+        "fee":0.1
+    }
+];
+
 
 
 
@@ -36,17 +133,17 @@ app.get('/price', function (req, res) {
 
 function retrieveData(req, res, type)
 {
-    //use as bar value in bar graph
+    // Used as bar value in bar graph
     var values1 = [];
     var values2 = [];
 
-    // Use as x axis labels in the bar graph
+    // Used as x axis labels in the bar graph
     var xlabels1 = [];
     var xlabels2 = [];
 
     var step = 0;
 
-    
+    // Get current timestamp
     const dateTime = Date.now();
     const currentTimestamp = Math.floor(dateTime / 1000);
     
@@ -184,9 +281,10 @@ function retrieveData(req, res, type)
 
 function renderTradingBarGraph(req, res, type, val1, xlab1, val2, xlab2, step)
 {
+    // Only render the bar graph after we got the data from both Bitfinex and Kraken
     if(step == 2)
     {
-        //set header
+        // Set header
         headerText = ((type == 0)?'Trade Amount Data':'Trade Price Data');
         
         fs.readFile('./public/bar-graph-template.html',function(error, content){ 
