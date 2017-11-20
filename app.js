@@ -131,6 +131,11 @@ app.get('/price', function (req, res) {
     retrieveData(req, res, 1);
 });
 
+app.get('/mytrades', function (req, res) {
+    renderMyTrades(req, res);
+});
+
+
 function retrieveData(req, res, type)
 {
     // Used as bar value in bar graph
@@ -302,4 +307,87 @@ function renderTradingBarGraph(req, res, type, val1, xlab1, val2, xlab2, step)
             }
         });
     }
+}
+
+function renderMyTrades(req, res)
+{
+    var value1 = []; // trade amount
+    var value2 = []; // withdraw amount
+    var value3 = []; // total amount
+    var xlabel = []; // time
+
+    var timestampMap = new Object();
+
+    for (var i = 0; i < myTrades.length; i++)
+    {
+        var timestamp = parseInt(myTrades[i]["timestamp"]);
+        
+        var dataObj = new Object();
+        dataObj["amount"] = myTrades[i]["amount"];
+        dataObj["type"] = "trade";
+        timestampMap[timestamp] = dataObj;
+    }
+    
+    for (var i = 0; i < myMovements.length; i++)
+    {
+        var timestamp = parseInt(myMovements[i]["timestamp"]);
+        
+        var dataObj = new Object();
+        dataObj["amount"] = myMovements[i]["amount"];
+        dataObj["type"] = "withdraw";
+        timestampMap[timestamp] = dataObj;
+    }
+    
+    var index = 0;
+    var total = 0;
+    for (var t in timestampMap)
+    {
+        var date = new Date(t*1000);
+        var datetext = date.toString();
+        xlabel.push(datetext);
+        
+        
+        if(timestampMap[t]["type"] == "trade")
+        {
+            value1.push(timestampMap[t]["amount"]);
+            total += parseFloat(timestampMap[t]["amount"]);
+        }
+        else
+        {
+            value1.push("0");
+        }
+        
+        if(timestampMap[t]["type"] == "withdraw")
+        {
+            value2.push(timestampMap[t]["amount"]);
+        }
+        else
+        {
+            value2.push("0");
+        }
+        
+        total = total - parseFloat(value2[index]);
+        value3.push(total);
+        
+        index++;
+    }
+    
+    
+    
+    fs.readFile('./public/myTrades.html',function(error, content){ 
+    if(error){
+        console.log('file read error');
+    }
+    else {
+        var rendered = content.toString()
+                    .replace('#valueData1#', value1.toString())
+                    .replace('#xLabelData1#', xlabel.toString())
+                    .replace('#valueData2#', value2.toString())
+                    .replace('#xLabelData2#', xlabel.toString())
+                    .replace('#valueData3#', value3.toString())
+                    .replace('#xLabelData3#', xlabel.toString());
+
+        res.send(rendered);
+    }
+});
 }

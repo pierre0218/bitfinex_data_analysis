@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<head>
+    <title>My Trades</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
+    
+</head>
+
+<body>
+    <h1>My Trades</h1>
+
+    <div id="graphDiv1" style="width:1020px;height:500px;"></div>
+    <br />
+    
+    <script>
+        var valueArray1 = '#valueData1#';
+        var xLabelArray1 = '#xLabelData1#';
+        var values1 = valueArray1.split(",");
+        var xlabels1 = xLabelArray1.split(",");
+        
+        var valueArray2 = '#valueData2#';
+        var xLabelArray2 = '#xLabelData2#';
+        var values2 = valueArray2.split(",");
+        var xlabels2 = xLabelArray2.split(",");
+        
+        var valueArray3 = '#valueData3#';
+        var xLabelArray3 = '#xLabelData3#';
+        var values3 = valueArray3.split(",");
+        var xlabels3 = xLabelArray3.split(",");
+        
+        var Canvas = document.getElementById('graphDiv1');
+
+        var trace1 = {
+          x: xlabels1,
+          y: values1,
+          name: 'Trade Amount',
+          type: 'scatter'
+        };
+
+        var trace2 = {
+          x: xlabels2,
+          y: values2,
+          name: 'Withdraw Amount',
+          type: 'scatter'
+        };
+        
+        var trace3 = {
+          x: xlabels3,
+          y: values3,
+          name: 'Owned Amount',
+          type: 'scatter'
+        };
+        
+        var data = [trace1, trace2, trace3];
+    
+       Plotly.newPlot(Canvas, data);
+
+    </script>
+
+</body>
+</html>
