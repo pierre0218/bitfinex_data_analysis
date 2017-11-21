@@ -1,6 +1,7 @@
 const express = require('express');
 var fs = require('fs');
 var request = require('request')
+var cmd=require('node-cmd');
 
 // Bitfinex API URL
 var bitfinex_url = "https://api.bitfinex.com/v1"
@@ -111,7 +112,7 @@ var myMovements = [
     }
 ];
 
-
+var testTxJson = '{"To": {"ToList": [{"ToList": [{"ToList": [{"ToList": [], "Value": 5.10317122, "Address": "1DvLrC3fdLNwEu32eWynbXyZtXi6Joyg8Y"}, {"ToList": [], "Value": 0.00555556, "Address": "12juM6caKurET9y3YuRYeUCZ8FKTh2XCEy"}], "Value": 5.10887678, "Address": "15nQUkUus6zihHm6erFdkCJVpm7nG7PUpw"}, {"ToList": [{"ToList": [], "Value": 0.01093679, "Address": "1AAq1Bf1M1S8WDwWjj3nrEGpHRwF2pxELe"}, {"ToList": [], "Value": 0.00011148, "Address": "1Gmpp7g3vzSZPTPvAbabexWSKpMZotcAbj"}], "Value": 0.01114827, "Address": "1LgMJmmpD7SUPy6C3q6S54At4SFZpNYNzU"}], "Value": 5.12017505, "Address": "1Aahx4tM2F2BEZmqdcxZEeqskNPzRKrsRt"}, {"ToList": [{"ToList": [{"ToList": [], "Value": 23.551706, "Address": "1LqxiSodNcDBttHCLqusW16rdvrSr3AdQY"}, {"ToList": [], "Value": 0.08051165, "Address": "3FqaVQtfAEMTMUzFknobbkfkrKuUvneKB5"}], "Value": 2.29351197, "Address": "34S5zbf6Wrkp2tmFgnHLkhCb979g33r7As"}], "Value": 0.0071, "Address": "36QjUFmcoymUWexsYK939FcfJrfSJbMPyY"}], "Value": 0, "Address": "1EEZzSWes5SE1j5KEULEXmJcD5HGt4ZgR2"}, "From": {"FromList": [{"FromList": [{"FromList": [{"FromList": [], "Value": 5.1624671, "Address": "1v5ctpWQz4v82LBXjTVdrnwYSN8K4T3aP"}], "Value": 5.14555732, "Address": "16P2VQFoS8cNM7wPSjMvMejrTMHUNT5RFo"}], "Value": 5.13202939, "Address": "1G7DLKVbvCFEWFwCHtWwZGSyn2hGXsXevi"}], "Value": 0, "Address": "1EEZzSWes5SE1j5KEULEXmJcD5HGt4ZgR2"}}';
 
 
 // Create express server
@@ -123,6 +124,20 @@ app.listen(3000);
 app.use(express.static("public"));
 
 // Set URL routing
+app.get('/', function (req, res) {
+    fs.readFile('./public/tree.html',function(error, content){ 
+		if(error){
+			console.log('file read error');
+		}
+		else {
+			var rendered = content.toString();
+
+			res.send(rendered);
+		}
+	});
+});
+
+
 app.get('/amount', function (req, res) {
     retrieveData(req, res, 0);
 });
@@ -133,6 +148,16 @@ app.get('/price', function (req, res) {
 
 app.get('/mytrades', function (req, res) {
     renderMyTrades(req, res);
+});
+
+app.get('/bitcointransactions', function (req, res) {
+    cmd.get(
+        'python findtxbyaddress.py 1EEZzSWes5SE1j5KEULEXmJcD5HGt4ZgR2',
+        function(err, data, stderr){
+            res.send(data);
+        }
+    );
+	
 });
 
 
@@ -375,19 +400,19 @@ function renderMyTrades(req, res)
     
     
     fs.readFile('./public/myTrades.html',function(error, content){ 
-    if(error){
-        console.log('file read error');
-    }
-    else {
-        var rendered = content.toString()
-                    .replace('#valueData1#', value1.toString())
-                    .replace('#xLabelData1#', xlabel.toString())
-                    .replace('#valueData2#', value2.toString())
-                    .replace('#xLabelData2#', xlabel.toString())
-                    .replace('#valueData3#', value3.toString())
-                    .replace('#xLabelData3#', xlabel.toString());
+		if(error){
+			console.log('file read error');
+		}
+		else {
+			var rendered = content.toString()
+						.replace('#valueData1#', value1.toString())
+						.replace('#xLabelData1#', xlabel.toString())
+						.replace('#valueData2#', value2.toString())
+						.replace('#xLabelData2#', xlabel.toString())
+						.replace('#valueData3#', value3.toString())
+						.replace('#xLabelData3#', xlabel.toString());
 
-        res.send(rendered);
-    }
-});
+			res.send(rendered);
+		}
+	});
 }

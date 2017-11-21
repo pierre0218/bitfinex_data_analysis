@@ -23,10 +23,14 @@ var CollapsibleTree = function(elt) {
   var vis = d3.select(elt).append("svg:svg")
       .attr("width", w + m[1] + m[3])
       .attr("height", h + m[0] + m[2])
+	  .call(d3.behavior.zoom().on("zoom", function () {
+		vis.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+	  }))
       .append("svg:g")
       // .attr("transform", "translate(" + m[3] + "," + m[0] + ")"); // left-right
       // .attr("transform", "translate(" + m[0] + "," + m[3] + ")"); // top-bottom
-      .attr("transform", "translate(0,"+h/2+")"); // bidirectional-tree
+      //.attr("transform", "translate(0,"+h/2+")")
+	  ; // bidirectional-tree
 
 
   var that = {
