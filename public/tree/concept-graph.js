@@ -45,7 +45,7 @@ var CollapsibleTree = function(elt) {
         root.y0 = h / 2;
 
         // Initialize the display to show a few nodes.
-        root.children.forEach(that.toggleAll);
+        //root.children.forEach(that.toggleAll);
         // that.toggle(root.children[1]);
         // that.toggle(root.children[1].children[2]);
         // that.toggle(root.children[9]);

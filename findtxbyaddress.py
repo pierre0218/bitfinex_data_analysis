@@ -7,12 +7,13 @@ if len(sys.argv) < 2:
  print 'no argument'
  sys.exit()
 
-
+# Connect to bitcoin node
 rpc = ServiceProxy("http://2b:hw234@140.112.29.42:8332")
 
-
+# Secify a trasaction address to be searched
 Addr=sys.argv[1] #"1JKk56ZN7BajpMadw9K7LqLrvVGFr5L2zd"  "1EEZzSWes5SE1j5KEULEXmJcD5HGt4ZgR2"
 
+# Call blockchain.info's api to retrieve an address's information
 def ListAddrTx(addr) :
 	data=json.loads(urlopen("https://blockchain.info/rawaddr/"+addr).read())
 	txs=data['txs']
@@ -38,6 +39,7 @@ def voutToAddr(txid,vout):
 	tx=rpc.decoderawtransaction(rpc.getrawtransaction(txid))
 	return tx['vout'][vout]['scriptPubKey']['addresses'][0]
 
+# Recursively search for the inputs of an address
 def findFromList(txid,vout,iteration):
 	if iteration<=0:
 		tx=rpc.decoderawtransaction(rpc.getrawtransaction(txid))
@@ -56,7 +58,7 @@ def findFrom(addr) :
 		fromList+=findFromList(i[0],i[1],3)['FromList']
 	return {"Address":addr,"FromList":fromList,"Value":0}
 	
-
+# Recursively search for the outputs of an address
 def findToList(addr,iteration):
 	if iteration<=0:
 		return []

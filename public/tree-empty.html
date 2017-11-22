@@ -2,13 +2,7 @@
 <html>
   <head>
     <title>Bitcoin Transaction Data</title>
-    <link rel="stylesheet" href="./tree/d3-collapsible-tree.css">
 
-
-    <script type="text/javascript" src="./tree/jquery-2.1.1.min.js"></script>
-    <script type="text/javascript" src="./tree/d3.min.js"></script>
-    <script type="text/javascript" src="./tree/d3.layout.js"></script>
-    
     <script type="text/javascript">
         window.onload = function() {
 
@@ -31,21 +25,8 @@
   </head>
   <body>
 
-    <h1 align="center">Bitcoin Transaction Data For #address#</h1>
+    <h1 align="center">Bitcoin Transaction Data</h1>
     Enter Address: <input type="text" id = "address" name="address"><br>
     <input type="submit" id="submit" value="Search">
-    
-    <div id="categoryHierarchy"></div>
-
-    <script type="text/javascript" src="./tree/concept-graph.js"></script>
-
-    <script>
-      $(document).ready(function(event) {
-        var tree = CollapsibleTree("#categoryHierarchy");
-        tree.init('treeMap.json');
-      });
-
-
-    </script>
   </body>
 </html>

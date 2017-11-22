@@ -124,20 +124,6 @@ app.listen(3000);
 app.use(express.static("public"));
 
 // Set URL routing
-app.get('/', function (req, res) {
-    fs.readFile('./public/tree.html',function(error, content){ 
-		if(error){
-			console.log('file read error');
-		}
-		else {
-			var rendered = content.toString();
-
-			res.send(rendered);
-		}
-	});
-});
-
-
 app.get('/amount', function (req, res) {
     retrieveData(req, res, 0);
 });
@@ -151,97 +137,139 @@ app.get('/mytrades', function (req, res) {
 });
 
 app.get('/bitcointransactions', function (req, res) {
-    /*cmd.get(
-        'python findtxbyaddress.py 1EEZzSWes5SE1j5KEULEXmJcD5HGt4ZgR2',
-        function(err, data, stderr){
-            res.send(data);
-        }
-    );*/
-	
-	var treeData = convertTransactionData(testTxJson);
-	
-	fs.writeFile("./public/treeMap.json", treeData, function(err) {
-		if(err) {
-			return console.log(err);
-		}
+    if(typeof(req.query.address) != 'undefined' && req.query.address != "")
+    {
+		// Call python to retrieve trasactions on the blockchain
+        /*cmd.get(
+        'python findtxbyaddress.py '+req.query.address,
+            function(err, data, stderr){
+                if(stderr)
+                {
+                    res.send(stderr);
+                }
+                else
+                {
+                    var treeData = convertTransactionData(data);
+                
+                    fs.writeFile("./public/treeMap.json", treeData, function(err) {
+                        if(err) {
+                            return console.log(err);
+                        }
 
-		fs.readFile('./public/tree.html',function(error, content){ 
-			if(error){
-				console.log('file read error');
-			}
-			else {
-				var rendered = content.toString();
+                        fs.readFile('./public/tree.html',function(error, content){ 
+                            if(error){
+                                console.log('file read error');
+                            }
+                            else {
+                                var rendered = content.toString().replace('#address#', req.query.address);
 
-				res.send(rendered);
-			}
-		});
-	}); 
-	
-	
+                                res.send(rendered);
+                            }
+                        });
+                    }); 
+                }
+            }
+        );*/
+        
+        var treeData = convertTransactionData(testTxJson);
+                
+        fs.writeFile("./public/treeMap.json", treeData, function(err) {
+            if(err) {
+                return console.log(err);
+            }
+
+            fs.readFile('./public/tree.html',function(error, content){ 
+                if(error){
+                    console.log('file read error');
+                }
+                else {
+                    var rendered = content.toString().replace('#address#', req.query.address);
+
+                    res.send(rendered);
+                }
+            });
+        }); 
+    }
+    else
+    {
+        fs.readFile('./public/tree-empty.html',function(error, content){ 
+            if(error){
+                console.log('file read error');
+            }
+            else {
+                var rendered = content.toString();
+
+                res.send(rendered);
+            }
+        });
+    }
 });
 
+// Convert trasaction json to tree map data
 function convertTransactionData(txJsonString)
 {
-	var txData = JSON.parse(txJsonString);
-	var toList = txData["To"];
-	var fromList = txData["From"];
-	
-	var dataTo = convertTransactionToData(toList);
-	var dataFrom = convertTransactionFromData(fromList);
-	if("children" in dataTo)
-	{
-		dataFrom["children"] = dataTo["children"];
-	}
-	
-	return JSON.stringify(dataFrom);
+    var txData = JSON.parse(txJsonString);
+    var toList = txData["To"];
+    var fromList = txData["From"];
+    
+    var dataTo = convertTransactionToData(toList);
+    var dataFrom = convertTransactionFromData(fromList);
+    if("children" in dataTo)
+    {
+        dataFrom["children"] = dataTo["children"];
+    }
+    
+    return JSON.stringify(dataFrom);
 }
 
+// Recursively build trasaction output links
 function convertTransactionToData(toList)
 {
-	if("Address" in toList)
-	{
-		var treeMap = new Object();
-		treeMap["name"] = toList["Address"];
-		treeMap["isparent"] = false;
-		if(toList["ToList"].length > 0)
-		{
-			treeMap["children"] = [];
-			for(var i =0; i < toList["ToList"].length; i++)
-			{
-				treeMap["children"].push(convertTransactionToData(toList["ToList"][i]));
-			}
-		}
-		
-		return treeMap;
-	}
-	else
-	{
-		return 'undefined';
-	}
+    if("Address" in toList)
+    {
+        var treeMap = new Object();
+        treeMap["name"] = toList["Address"]+"\t"+toList["Value"];
+        treeMap["isparent"] = false;
+        if(toList["ToList"].length > 0)
+        {
+            treeMap["children"] = [];
+            for(var i =0; i < toList["ToList"].length; i++)
+            {
+                treeMap["children"].push(convertTransactionToData(toList["ToList"][i]));
+            }
+        }
+        
+        return treeMap;
+    }
+    else
+    {
+        return 'undefined';
+    }
 }
 
+// Recursively build trasaction input links
 function convertTransactionFromData(fromList)
 {
-	if("Address" in fromList)
-	{
-		var treeMap = new Object();
-		treeMap["name"] = fromList["Address"];
-		treeMap["isparent"] = true;
-		if(fromList["FromList"].length > 0)
-		{
-			treeMap["parents"] = [];
-			for(var i =0; i < fromList["FromList"].length; i++)
-			{
-				treeMap["parents"].push(convertTransactionFromData(fromList["FromList"][i]));
-			}
-		}
-		
-		return treeMap;
-	}
-	else
-	{
-		return 'undefined';
-	}
+    if("Address" in fromList)
+    {
+        var treeMap = new Object();
+        treeMap["name"] = fromList["Address"]+"\t"+fromList["Value"];
+        treeMap["isparent"] = true;
+        if(fromList["FromList"].length > 0)
+        {
+            treeMap["parents"] = [];
+            for(var i =0; i < fromList["FromList"].length; i++)
+            {
+                treeMap["parents"].push(convertTransactionFromData(fromList["FromList"][i]));
+            }
+        }
+        
+        return treeMap;
+    }
+    else
+    {
+        return 'undefined';
+    }
 }
 
 
@@ -484,19 +512,19 @@ function renderMyTrades(req, res)
     
     
     fs.readFile('./public/myTrades.html',function(error, content){ 
-		if(error){
-			console.log('file read error');
-		}
-		else {
-			var rendered = content.toString()
-						.replace('#valueData1#', value1.toString())
-						.replace('#xLabelData1#', xlabel.toString())
-						.replace('#valueData2#', value2.toString())
-						.replace('#xLabelData2#', xlabel.toString())
-						.replace('#valueData3#', value3.toString())
-						.replace('#xLabelData3#', xlabel.toString());
+        if(error){
+            console.log('file read error');
+        }
+        else {
+            var rendered = content.toString()
+                        .replace('#valueData1#', value1.toString())
+                        .replace('#xLabelData1#', xlabel.toString())
+                        .replace('#valueData2#', value2.toString())
+                        .replace('#xLabelData2#', xlabel.toString())
+                        .replace('#valueData3#', value3.toString())
+                        .replace('#xLabelData3#', xlabel.toString());
 
-			res.send(rendered);
-		}
-	});
+            res.send(rendered);
+        }
+    });
 }
