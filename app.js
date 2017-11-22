@@ -151,14 +151,98 @@ app.get('/mytrades', function (req, res) {
 });
 
 app.get('/bitcointransactions', function (req, res) {
-    cmd.get(
+    /*cmd.get(
         'python findtxbyaddress.py 1EEZzSWes5SE1j5KEULEXmJcD5HGt4ZgR2',
         function(err, data, stderr){
             res.send(data);
         }
-    );
+    );*/
+	
+	var treeData = convertTransactionData(testTxJson);
+	
+	fs.writeFile("./public/treeMap.json", treeData, function(err) {
+		if(err) {
+			return console.log(err);
+		}
+
+		fs.readFile('./public/tree.html',function(error, content){ 
+			if(error){
+				console.log('file read error');
+			}
+			else {
+				var rendered = content.toString();
+
+				res.send(rendered);
+			}
+		});
+	}); 
+	
 	
 });
+
+function convertTransactionData(txJsonString)
+{
+	var txData = JSON.parse(txJsonString);
+	var toList = txData["To"];
+	var fromList = txData["From"];
+	
+	var dataTo = convertTransactionToData(toList);
+	var dataFrom = convertTransactionFromData(fromList);
+	if("children" in dataTo)
+	{
+		dataFrom["children"] = dataTo["children"];
+	}
+	
+	return JSON.stringify(dataFrom);
+}
+
+function convertTransactionToData(toList)
+{
+	if("Address" in toList)
+	{
+		var treeMap = new Object();
+		treeMap["name"] = toList["Address"];
+		treeMap["isparent"] = false;
+		if(toList["ToList"].length > 0)
+		{
+			treeMap["children"] = [];
+			for(var i =0; i < toList["ToList"].length; i++)
+			{
+				treeMap["children"].push(convertTransactionToData(toList["ToList"][i]));
+			}
+		}
+		
+		return treeMap;
+	}
+	else
+	{
+		return 'undefined';
+	}
+}
+
+function convertTransactionFromData(fromList)
+{
+	if("Address" in fromList)
+	{
+		var treeMap = new Object();
+		treeMap["name"] = fromList["Address"];
+		treeMap["isparent"] = true;
+		if(fromList["FromList"].length > 0)
+		{
+			treeMap["parents"] = [];
+			for(var i =0; i < fromList["FromList"].length; i++)
+			{
+				treeMap["parents"].push(convertTransactionFromData(fromList["FromList"][i]));
+			}
+		}
+		
+		return treeMap;
+	}
+	else
+	{
+		return 'undefined';
+	}
+}
 
 
 function retrieveData(req, res, type)
