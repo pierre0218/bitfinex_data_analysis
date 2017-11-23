@@ -140,7 +140,7 @@ app.get('/bitcointransactions', function (req, res) {
     if(typeof(req.query.address) != 'undefined' && req.query.address != "")
     {
 		// Call python to retrieve trasactions on the blockchain
-        /*cmd.get(
+        cmd.get(
         'python findtxbyaddress.py '+req.query.address,
             function(err, data, stderr){
                 if(stderr)
@@ -169,9 +169,9 @@ app.get('/bitcointransactions', function (req, res) {
                     }); 
                 }
             }
-        );*/
+        );
         
-        var treeData = convertTransactionData(testTxJson);
+        /*var treeData = convertTransactionData(testTxJson);
                 
         fs.writeFile("./public/treeMap.json", treeData, function(err) {
             if(err) {
@@ -188,7 +188,7 @@ app.get('/bitcointransactions', function (req, res) {
                     res.send(rendered);
                 }
             });
-        }); 
+        }); */
     }
     else
     {

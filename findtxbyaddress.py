@@ -8,7 +8,7 @@ if len(sys.argv) < 2:
  sys.exit()
 
 # Connect to bitcoin node
-rpc = ServiceProxy("http://2b:hw234@140.112.29.42:8332")
+rpc = ServiceProxy("http://2b:hw1234@140.112.29.42:8332")
 
 # Secify a trasaction address to be searched
 Addr=sys.argv[1] #"1JKk56ZN7BajpMadw9K7LqLrvVGFr5L2zd"  "1EEZzSWes5SE1j5KEULEXmJcD5HGt4ZgR2"
